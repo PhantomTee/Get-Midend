@@ -5,7 +5,7 @@ import { Upload, Download, Copy, Share2, RefreshCw, Image as ImageIcon, Sun, Moo
 import { motion, AnimatePresence } from 'motion/react';
 
 const BackgroundBlobs = () => (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 mix-blend-screen opacity-50 dark:mix-blend-screen dark:opacity-60">
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 mix-blend-multiply opacity-20 dark:mix-blend-screen dark:opacity-60 pointer-events-none">
         {[1, 2, 3].map((i) => (
             <motion.div
                 key={i}
@@ -41,6 +41,15 @@ export default function Page() {
   const [copySuccess, setCopySuccess] = useState(false);
   
   const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -252,7 +261,6 @@ export default function Page() {
   };
 
   return (
-    <div className={isDark ? 'dark' : ''}>
     <main className="min-h-screen relative bg-page text-text-main flex flex-col p-4 md:p-8 overflow-x-hidden font-sans selection:bg-orange selection:text-page transition-colors duration-300">
       <BackgroundBlobs />
       <header className="relative z-10 flex flex-wrap justify-between items-center mb-8 border-b border-border-subtle pb-4 w-full max-w-6xl mx-auto gap-4">
@@ -479,7 +487,6 @@ export default function Page() {
         <div>&copy; {new Date().getFullYear()} MIDEN_STUDIOS</div>
       </footer>
     </main>
-    </div>
   );
 
 }

@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-page: var(--page);
   --color-surface: var(--surface);
@@ -24,7 +26,7 @@
     --border-subtle: rgba(13, 13, 13, 0.1);
     --border-strong: rgba(13, 13, 13, 0.2);
   }
-  
+
   .dark {
     /* Dark Mode */
     --page: #0D0D0D;
@@ -38,15 +40,15 @@
 }
 
 .halftone-preview {
-  background-color: #F5E6D3;
-  background-image: radial-gradient(#E8622A 3.5px, transparent 3.5px);
+  background-color: var(--color-page);
+  background-image: radial-gradient(var(--color-orange) 3.5px, transparent 3.5px);
   background-size: 10px 10px;
   mask-image: radial-gradient(circle at center, black, transparent 80%);
 }
 
 input[type='range'] {
   appearance: none;
-  background: #262626;
+  background: var(--border-strong);
   height: 4px;
   border-radius: 2px;
 }
@@ -55,13 +57,13 @@ input[type='range']::-webkit-slider-thumb {
   appearance: none;
   width: 16px;
   height: 16px;
-  background: #E8622A;
+  background: var(--color-orange);
   border-radius: 50%;
   cursor: pointer;
 }
 
 .btn-primary {
-  background-color: #E8622A;
+  background-color: var(--color-orange);
   color: #0D0D0D;
   font-weight: 600;
   transition: all 0.2s;
@@ -69,6 +71,6 @@ input[type='range']::-webkit-slider-thumb {
 
 .btn-secondary {
   background-color: transparent;
-  border: 1px solid #333;
-  color: #999;
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
 }
