@@ -1,8 +1,35 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Upload, Download, Copy, Share2, RefreshCw, Image as ImageIcon } from 'lucide-react';
+import { Upload, Download, Copy, Share2, RefreshCw, Image as ImageIcon, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+
+const BackgroundBlobs = () => (
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 mix-blend-screen opacity-50 dark:mix-blend-screen dark:opacity-60">
+        {[1, 2, 3].map((i) => (
+            <motion.div
+                key={i}
+                className="absolute rounded-full bg-orange filter blur-[100px] md:blur-[140px] opacity-30"
+                style={{
+                    width: i === 1 ? '45vw' : i === 2 ? '35vw' : '50vw',
+                    height: i === 1 ? '45vw' : i === 2 ? '35vw' : '50vw',
+                    top: i === 1 ? '10%' : i === 2 ? '40%' : '-10%',
+                    left: i === 1 ? '10%' : i === 2 ? 'auto' : '30%',
+                    right: i === 2 ? '10%' : 'auto',
+                }}
+                animate={{
+                    x: ['0%', i === 1 ? '15%' : i === 2 ? '-20%' : '10%', i === 1 ? '-5%' : '10%', '0%'],
+                    y: ['0%', i === 1 ? '10%' : '-15%', i === 3 ? '5%' : '10%', '0%'],
+                }}
+                transition={{
+                    duration: 30 + i * 10,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                }}
+            />
+        ))}
+    </div>
+);
 
 export default function Page() {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -13,6 +40,7 @@ export default function Page() {
   const [isDragging, setIsDragging] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   
+  const [isDark, setIsDark] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
@@ -224,12 +252,21 @@ export default function Page() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0D0D0D] text-white flex flex-col p-4 md:p-8 overflow-x-hidden font-sans selection:bg-[#E8622A] selection:text-[#0D0D0D]">
-      <header className="flex justify-between items-center mb-8 border-b border-white/5 pb-4 w-full max-w-6xl mx-auto">
+    <div className={isDark ? 'dark' : ''}>
+    <main className="min-h-screen relative bg-page text-text-main flex flex-col p-4 md:p-8 overflow-x-hidden font-sans selection:bg-orange selection:text-page transition-colors duration-300">
+      <BackgroundBlobs />
+      <header className="relative z-10 flex flex-wrap justify-between items-center mb-8 border-b border-border-subtle pb-4 w-full max-w-6xl mx-auto gap-4">
         <div className="flex flex-col">
-          <h1 className="text-4xl md:text-5xl font-space font-bold text-[#E8622A] tracking-tighter uppercase">Get Miden&apos;d</h1>
-          <p className="text-xs text-white/40 tracking-[0.2em] uppercase mt-1">Turn your pfp into pixel art</p>
+          <h1 className="text-4xl md:text-5xl font-space font-bold text-orange tracking-tighter uppercase">Get Miden&apos;d</h1>
+          <p className="text-xs text-text-muted tracking-[0.2em] uppercase mt-1">Turn your pfp into Miden themed Pixel Art</p>
         </div>
+        <button 
+            onClick={() => setIsDark(!isDark)}
+            className="p-2 rounded-full border border-border-subtle bg-surface hover:bg-surface-hover transition-colors text-text-main"
+            title="Toggle theme"
+        >
+            {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        </button>
       </header>
 
       {error && (
@@ -242,7 +279,7 @@ export default function Page() {
         <motion.div
            initial={{ opacity: 0, y: 20 }}
            animate={{ opacity: 1, y: 0 }}
-           className={`w-full max-w-6xl mx-auto flex-1 flex flex-col justify-center items-center border border-dashed rounded-3xl p-12 lg:p-24 text-center transition-all duration-300 min-h-[400px] cursor-pointer group ${isDragging ? 'border-[#E8622A] bg-[#E8622A]/5 scale-[1.02]' : 'border-white/10 bg-[#151515]/50 opacity-70 hover:opacity-100 hover:bg-[#151515]'}`}
+           className={`w-full max-w-6xl mx-auto flex-1 flex flex-col justify-center items-center border border-dashed rounded-3xl p-12 lg:p-24 text-center transition-all duration-300 min-h-[400px] cursor-pointer group relative z-10 shadow-sm ${isDragging ? 'border-orange bg-orange/5 scale-[1.02]' : 'border-border-strong bg-surface/50 hover:bg-surface'}`}
            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
            onDragLeave={() => setIsDragging(false)}
            onDrop={handleDrop}
@@ -255,38 +292,38 @@ export default function Page() {
             accept="image/*" 
             className="hidden" 
           />
-          <Upload className="w-8 h-8 text-white/20 mb-4 group-hover:block transition-all group-hover:scale-110" />
-          <p className="text-[11px] uppercase tracking-widest text-white/40">Drag image to start over, or click to browse</p>
+          <Upload className="w-8 h-8 text-text-muted mb-4 group-hover:block transition-all group-hover:scale-110 group-hover:text-orange" />
+          <p className="text-[11px] uppercase tracking-widest text-text-muted">Drag image to start over, or click to browse</p>
         </motion.div>
       ) : (
         <motion.div 
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }}
-            className="w-full max-w-6xl mx-auto flex-1 grid grid-cols-1 md:grid-cols-12 gap-8 items-start min-h-0"
+            className="w-full max-w-6xl mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start min-h-0 relative z-10"
         >
-            <div className="md:col-span-8 flex flex-col gap-4">
-                <div className="relative flex flex-col md:flex-row gap-6 w-full items-center justify-center bg-[#151515] p-6 lg:p-8 rounded-3xl border border-white/5 group overflow-hidden min-h-[400px]">
-                    <div className="absolute inset-0 halftone-preview opacity-90 pointer-events-none transition-opacity duration-500"></div>
+            <div className="lg:col-span-8 flex flex-col gap-4">
+                <div className="relative flex flex-col md:flex-row gap-6 w-full items-center justify-center bg-surface p-6 lg:p-8 rounded-3xl border border-border-subtle group overflow-hidden min-h-[400px] shadow-sm">
+                    <div className="absolute inset-0 halftone-preview opacity-[0.15] dark:opacity-90 pointer-events-none transition-opacity duration-500"></div>
                     
                     {/* Resolution badge */}
                     <div className="absolute bottom-4 right-4 bg-black/40 px-3 py-1 rounded text-[10px] text-white/50 border border-white/5 z-20 font-mono">
                         1024 x 1024 PX
                     </div>
                     {/* Engine badge */}
-                    <div className="absolute top-4 left-4 text-[10px] font-mono text-white/20 z-20 hidden md:block">RENDER_ENGINE: MIDEN_DOT_V1.0</div>
+                    <div className="absolute top-4 left-4 text-[10px] font-mono text-text-muted z-20 hidden md:block mix-blend-difference text-white">RENDER_ENGINE: MIDEN_DOT_V1.0</div>
                     
                     {/* Central pill for before/after layout */}
-                    <div className="absolute z-20 top-4 pt-1 bg-[#0D0D0D]/80 backdrop-blur-md px-6 py-2 rounded-full border border-white/10 hidden md:flex items-center gap-4 shadow-xl">
-                         <span className="text-xs font-semibold uppercase tracking-wider text-[#E8622A] flex items-center gap-2">
+                    <div className="absolute z-20 top-4 pt-1 bg-page/80 backdrop-blur-md px-6 py-2 rounded-full border border-border-subtle hidden md:flex items-center gap-4 shadow-xl">
+                         <span className="text-xs font-semibold uppercase tracking-wider text-orange flex items-center gap-2">
                              After {isProcessing && <RefreshCw className="w-3 h-3 animate-spin"/>}
                          </span>
-                         <div className="h-4 w-[1px] bg-white/20"></div>
-                         <span className="text-xs font-semibold uppercase tracking-wider text-white/60">Before</span>
+                         <div className="h-4 w-[1px] bg-border-strong"></div>
+                         <span className="text-xs font-semibold uppercase tracking-wider text-text-muted">Before</span>
                     </div>
 
                     {/* After */}
                     <div className="w-full max-w-[320px] lg:max-w-[400px] flex flex-col gap-3 items-center z-10">
-                        <div className="relative w-full aspect-square flex items-center justify-center rounded-2xl ring-1 ring-white/10 bg-[#0D0D0D]/50 overflow-hidden group shadow-2xl">
+                        <div className="relative w-full aspect-square flex items-center justify-center rounded-2xl ring-1 ring-border-strong bg-black/50 overflow-hidden group shadow-2xl">
                             <canvas 
                                 ref={canvasRef} 
                                 className={`max-w-full max-h-full object-contain transition-opacity duration-300 ${isProcessing ? 'opacity-40' : 'opacity-100'} ${circleCrop ? 'rounded-full' : 'rounded-2xl'}`} 
@@ -295,11 +332,11 @@ export default function Page() {
                                 {isProcessing && (
                                     <motion.div 
                                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                        className="absolute inset-0 flex items-center justify-center bg-[#0D0D0D]/50 backdrop-blur-sm"
+                                        className="absolute inset-0 flex items-center justify-center bg-page/50 backdrop-blur-sm"
                                     >
                                         <div className="flex flex-col items-center gap-4">
-                                            <RefreshCw className="w-8 h-8 text-[#E8622A] animate-spin" />
-                                            <span className="text-[10px] font-mono text-[#E8622A] animate-pulse">RENDERING...</span>
+                                            <RefreshCw className="w-8 h-8 text-orange animate-spin" />
+                                            <span className="text-[10px] font-mono text-orange animate-pulse bg-page/80 px-2 py-1 rounded">RENDERING...</span>
                                         </div>
                                     </motion.div>
                                 )}
@@ -312,38 +349,44 @@ export default function Page() {
                     </div>
 
                     {/* Before */}
-                    <div className="w-full max-w-[120px] md:max-w-[160px] flex flex-col gap-3 items-center z-10 md:absolute md:bottom-8 md:bg-[#0D0D0D]/60 md:p-3 md:rounded-2xl md:backdrop-blur-sm md:border md:border-white/5 md:left-8">
-                        <div className="relative w-full aspect-square rounded-xl overflow-hidden ring-1 ring-white/10 bg-black/50 shadow-xl">
+                    <div className="w-full max-w-[120px] md:max-w-[160px] flex flex-col gap-3 items-center z-10 md:absolute md:bottom-8 md:bg-page/60 md:p-3 md:rounded-2xl md:backdrop-blur-sm md:border md:border-border-subtle md:left-8">
+                        <div className="relative w-full aspect-square rounded-xl overflow-hidden ring-1 ring-border-strong bg-black/50 shadow-xl">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={imageSrc} className={`w-full h-full object-cover transition-all ${circleCrop ? 'rounded-full scale-[0.98]' : 'rounded-xl'}`} alt="Original" />
                         </div>
-                        <span className="md:hidden text-[10px] uppercase tracking-widest text-white/40 font-bold font-space text-center w-full">Before</span>
+                        <span className="md:hidden text-[10px] uppercase tracking-widest text-text-muted font-bold font-space text-center w-full">Before</span>
                     </div>
                 </div>
 
                 <div className="flex gap-4 justify-center items-center py-2 md:-translate-y-2 hidden md:flex">
                     <div className="flex -space-x-2">
-                        <div className="w-8 h-8 rounded-full border-2 border-[#0D0D0D] bg-[#F5E6D3] flex items-center justify-center">
-                            <div className="w-4 h-4 rounded-full bg-[#E8622A]"></div>
+                        <div className="w-8 h-8 rounded-full border-2 border-page bg-cream flex items-center justify-center relative overflow-hidden">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src="https://picsum.photos/seed/face1/100/100" alt="Avatar" className="w-full h-full object-cover absolute inset-0 opacity-40 mix-blend-luminosity" />
+                            <div className="w-4 h-4 rounded-full bg-orange z-10"></div>
                         </div>
-                        <div className="w-8 h-8 rounded-full border-2 border-[#0D0D0D] bg-[#F5E6D3] flex items-center justify-center">
-                            <div className="w-2 h-2 rounded-full bg-[#E8622A]"></div>
+                        <div className="w-8 h-8 rounded-full border-2 border-page bg-cream flex items-center justify-center relative overflow-hidden">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src="https://picsum.photos/seed/face2/100/100" alt="Avatar" className="w-full h-full object-cover absolute inset-0 opacity-40 mix-blend-luminosity" />
+                            <div className="w-2 h-2 rounded-full bg-orange z-10"></div>
                         </div>
-                        <div className="w-8 h-8 rounded-full border-2 border-[#0D0D0D] bg-[#F5E6D3] flex items-center justify-center">
-                            <div className="w-6 h-6 rounded-full bg-[#E8622A]"></div>
+                        <div className="w-8 h-8 rounded-full border-2 border-page bg-cream flex items-center justify-center relative overflow-hidden">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src="https://picsum.photos/seed/face3/100/100" alt="Avatar" className="w-full h-full object-cover absolute inset-0 opacity-40 mix-blend-luminosity" />
+                            <div className="w-6 h-6 rounded-full bg-orange z-10"></div>
                         </div>
                     </div>
-                    <p className="text-[11px] text-white/40 italic uppercase tracking-wider">Your pfp could look like this &rarr;</p>
+                    <p className="text-[11px] text-text-muted italic uppercase tracking-wider">Your pfp could look like this &rarr;</p>
                 </div>
             </div>
 
             {/* Controls */}
-            <div className="md:col-span-4 flex flex-col gap-6">
-                <div className="bg-[#151515] p-6 rounded-3xl border border-white/5 flex flex-col gap-6">
+            <div className="lg:col-span-4 flex flex-col gap-6 w-full max-w-sm mx-auto lg:max-w-none">
+                <div className="bg-surface p-6 rounded-3xl border border-border-subtle flex flex-col gap-6 shadow-sm">
                     <div className="space-y-5">
                         <div>
                             <div className="flex justify-between items-center mb-2">
-                                <label className="text-[11px] uppercase tracking-widest text-white/60">Dot Size</label>
+                                <label className="text-[11px] uppercase tracking-widest text-text-muted font-semibold">Dot Size</label>
                                 <span className="text-[11px] text-[#E8622A] font-mono">{dotSize}px</span>
                             </div>
                             <input 
@@ -356,7 +399,7 @@ export default function Page() {
 
                         <div>
                             <div className="flex justify-between items-center mb-2">
-                                <label className="text-[11px] uppercase tracking-widest text-white/60">Contrast</label>
+                                <label className="text-[11px] uppercase tracking-widest text-text-muted font-semibold">Contrast</label>
                                 <span className="text-[11px] text-[#E8622A] font-mono">{Math.round(contrast * 100)}%</span>
                             </div>
                             <input 
@@ -367,8 +410,8 @@ export default function Page() {
                             />
                         </div>
 
-                        <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-4">
-                            <label className="text-[11px] uppercase tracking-widest text-white/60">Circular Crop</label>
+                        <div className="flex items-center justify-between pt-4 border-t border-border-subtle mt-4">
+                            <label className="text-[11px] uppercase tracking-widest text-text-muted font-semibold">Circular Crop</label>
                             <label className="relative flex items-center justify-center cursor-pointer group">
                                 <input 
                                     type="checkbox" 
@@ -376,8 +419,8 @@ export default function Page() {
                                     onChange={e => setCircleCrop(e.target.checked)}
                                     className="hidden"
                                 />
-                                <div className={`w-10 h-5 rounded-full relative p-1 transition-colors ${circleCrop ? 'bg-[#E8622A]' : 'bg-white/10 group-hover:bg-white/20'}`}>
-                                    <div className={`absolute top-1 w-3 h-3 rounded-full transition-all duration-300 shadow-sm ${circleCrop ? 'right-1 bg-[#0D0D0D]' : 'left-1 bg-[#0D0D0D]'}`}></div>
+                                <div className={`w-10 h-5 rounded-full relative p-1 transition-colors ${circleCrop ? 'bg-orange' : 'bg-border-strong group-hover:bg-border-strong/80'}`}>
+                                    <div className={`absolute top-1 w-3 h-3 rounded-full transition-all duration-300 shadow-sm ${circleCrop ? 'right-1 bg-page' : 'left-1 bg-page'}`}></div>
                                 </div>
                             </label>
                         </div>
@@ -388,7 +431,7 @@ export default function Page() {
                     <button 
                         onClick={handleDownload}
                         disabled={isProcessing}
-                        className="btn-primary py-4 rounded-2xl flex items-center justify-center gap-2 hover:scale-[1.02] uppercase tracking-widest text-[11px] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="btn-primary py-4 rounded-2xl flex items-center justify-center gap-2 hover:scale-[1.02] uppercase tracking-widest text-[11px] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                     >
                         <Download className="w-4 h-4"/>
                         DOWNLOAD PNG
@@ -399,17 +442,17 @@ export default function Page() {
                             onClick={handleCopy}
                             title="Copy to Clipboard"
                             disabled={isProcessing}
-                            className={`btn-secondary py-3 rounded-2xl flex items-center justify-center gap-2 uppercase tracking-widest text-[11px] disabled:opacity-50 hover:border-white/20 hover:text-white transition-all ${copySuccess ? 'border-green-500/50 text-green-400' : ''}`}
+                            className={`btn-secondary py-3 rounded-2xl flex items-center justify-center gap-2 uppercase tracking-widest text-[11px] disabled:opacity-50 hover:bg-surface-hover hover:text-text-main transition-all ${copySuccess ? 'border-green-500/50 text-green-600 dark:text-green-400' : ''}`}
                         >
                             <Copy className="w-3 h-3"/>
                             {copySuccess ? 'Copied' : 'Copy'}
                         </button>
 
                         <a 
-                            href="https://twitter.com/intent/tweet?text=Just+got+Miden'd!+getmidend.com"
+                            href="https://twitter.com/intent/tweet?text=Just+got+Miden'd!+https://get-midend.vercel.app/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn-secondary py-3 rounded-2xl flex items-center justify-center gap-2 uppercase tracking-widest text-[11px] hover:border-white/20 hover:text-white transition-all"
+                            className="btn-secondary py-3 rounded-2xl flex items-center justify-center gap-2 uppercase tracking-widest text-[11px] hover:bg-surface-hover hover:text-text-main transition-all"
                         >
                             <Share2 className="w-3 h-3"/>
                             Share to X
@@ -418,7 +461,7 @@ export default function Page() {
 
                     <button 
                          onClick={reset}
-                         className="btn-secondary py-4 mt-1 rounded-2xl text-[11px] uppercase tracking-widest hover:border-white/20 hover:text-white transition-all"
+                         className="btn-secondary py-4 mt-1 rounded-2xl text-[11px] uppercase tracking-widest hover:bg-surface-hover hover:text-text-main transition-all border-dashed"
                     >
                         Try Another Image
                     </button>
@@ -426,38 +469,17 @@ export default function Page() {
             </div>
         </motion.div>
       )}
-
-      {/* Gallery Section */}
-      <div className="w-full max-w-6xl mt-24 border-t border-white/5 pt-16 pb-12">
-        <h3 className="font-space text-lg font-bold mb-10 text-center uppercase tracking-widest text-white/80">More Examples <span className="text-[#E8622A]">→</span></h3>
-        <div className="flex flex-wrap justify-center gap-8">
-            {[1, 2, 3].map(i => (
-                <div key={i} className="relative group w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border border-[#E8622A]/20 bg-[#F5E6D3] flex items-center justify-center shadow-lg shadow-[#E8622A]/10">
-                    <div className="absolute inset-0 bg-[#E8622A] opacity-20 group-hover:opacity-0 transition-opacity z-10 mix-blend-color-burn"></div>
-                    <div className="absolute inset-0" style={{
-                      backgroundImage: 'radial-gradient(#E8622A 30%, transparent 30%)',
-                      backgroundSize: `${i * 2 + 6}px ${i * 2 + 6}px`,
-                      maskImage: 'radial-gradient(circle at center, black 40%, transparent 70%)',
-                      WebkitMaskImage: 'radial-gradient(circle at center, black 40%, transparent 70%)',
-                      opacity: 0.8
-                    }}></div>
-                    <div className="absolute bottom-0 w-3/4 h-2/3" style={{
-                       backgroundImage: 'radial-gradient(#E8622A 40%, transparent 40%)',
-                       backgroundSize: `${i * 3 + 4}px ${i * 3 + 4}px`,
-                       maskImage: 'ellipse 50% 100% at 50% 100%',
-                       WebkitMaskImage: 'ellipse 50% 100% at 50% 100%',
-                       bottom: '-10%'
-                    }}></div>
-                </div>
-            ))}
-        </div>
-      </div>
       
-      <footer className="w-full max-w-6xl mx-auto mt-12 flex justify-between items-center text-[10px] text-white/20 font-mono border-t border-white/5 pt-6 uppercase tracking-widest pb-6">
-        <div>NO_APIS // CLIENT_SIDE_ONLY</div>
+      <footer className="w-full max-w-6xl mx-auto mt-12 flex justify-between items-center text-[10px] text-text-muted font-mono border-t border-border-subtle pt-6 uppercase tracking-widest pb-6 relative z-10">
+        <div className="flex gap-4">
+          <a href="https://twitter.com/0x___Ygen" target="_blank" rel="noopener noreferrer" className="hover:text-orange transition-colors">@0x___Ygen</a>
+          <span>|</span>
+          <a href="https://twitter.com/0xMiden" target="_blank" rel="noopener noreferrer" className="hover:text-orange transition-colors">@0xMiden</a>
+        </div>
         <div>&copy; {new Date().getFullYear()} MIDEN_STUDIOS</div>
       </footer>
     </main>
+    </div>
   );
 
 }

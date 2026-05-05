@@ -1,5 +1,42 @@
 @import "tailwindcss";
 
+@theme {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  
+  --color-orange: #E8622A;
+  --color-cream: #F5E6D3;
+}
+
+@layer base {
+  :root {
+    /* Light Mode */
+    --page: #F5E6D3;
+    --surface: #FFFFFF;
+    --surface-hover: #FAFAFA;
+    --text-main: #0D0D0D;
+    --text-muted: rgba(13, 13, 13, 0.5);
+    --border-subtle: rgba(13, 13, 13, 0.1);
+    --border-strong: rgba(13, 13, 13, 0.2);
+  }
+  
+  .dark {
+    /* Dark Mode */
+    --page: #0D0D0D;
+    --surface: #151515;
+    --surface-hover: rgba(255, 255, 255, 0.05);
+    --text-main: #FFFFFF;
+    --text-muted: rgba(255, 255, 255, 0.4);
+    --border-subtle: rgba(255, 255, 255, 0.05);
+    --border-strong: rgba(255, 255, 255, 0.1);
+  }
+}
+
 .halftone-preview {
   background-color: #F5E6D3;
   background-image: radial-gradient(#E8622A 3.5px, transparent 3.5px);
